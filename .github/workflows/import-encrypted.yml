@@ -14,19 +14,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Download and verify encrypted-only polished game
+      - name: Download and verify encrypted-only readability and smooth-map update
         run: |
           set -euo pipefail
-          curl --fail --location --retry 3 --proto '=https' --tlsv1.2 'https://github.com/orzull/rebirth-escocia-web/releases/download/encrypted-polish-v1/rebirth-encrypted-web.zip' -o /tmp/rebirth-encrypted-web.zip
-          echo 'c87795120fbab9ced9de26d37ac851e10bfe9aa3e449d981523c322a531bc09f  /tmp/rebirth-encrypted-web.zip' | sha256sum --check
+          curl --fail --location --retry 3 --proto '=https' --tlsv1.2 'https://github.com/orzull/rebirth-escocia-web/releases/download/encrypted-readability-v2/rebirth-encrypted-web.zip' -o /tmp/rebirth-encrypted-web.zip
+          echo '1633293156cef2fe641550351398daabcafa777b5149bdbed4d23b3d2d8f3e8d  /tmp/rebirth-encrypted-web.zip' | sha256sum --check
           python3 - <<'PY'
           import zipfile, pathlib, shutil, hashlib
-          allowed = {'index.html','auth.js','game.8835af777cd2082b6b68.encrypted.json','sw.js','manifest.webmanifest','icon-192.png','icon-512.png','apple-touch-icon.png','robots.txt','.nojekyll'}
+          allowed = {'index.html','auth.js','game.9468e690f93247434ec5.encrypted.json','sw.js','manifest.webmanifest','icon-192.png','icon-512.png','apple-touch-icon.png','robots.txt','.nojekyll'}
           with zipfile.ZipFile('/tmp/rebirth-encrypted-web.zip') as z:
               assert len(z.infolist()) == len(allowed)
               assert set(z.namelist()) == allowed
               assert sum(i.file_size for i in z.infolist()) < 4000000
-              assert hashlib.sha256(z.read('game.8835af777cd2082b6b68.encrypted.json')).hexdigest() == '8835af777cd2082b6b6872abf0e639ecb745ed77bd5fe480958f25dc4848a4b7'
+              assert hashlib.sha256(z.read('game.9468e690f93247434ec5.encrypted.json')).hexdigest() == '9468e690f93247434ec52ff4de7ab27bf2b3b9b0951fce7995f8505af8a34bfd'
               for name in allowed:
                   data = z.read(name)
                   assert b'BOARD_IMAGE' not in data
@@ -44,6 +44,6 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A docs
           if ! git diff --cached --quiet; then
-            git commit -m 'Replace personal game with encrypted polished map and vector cards'
+            git commit -m 'Publish mission status marks, smaller tiles and smoother map navigation'
             git push origin HEAD:main
           fi
