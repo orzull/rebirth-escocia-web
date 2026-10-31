@@ -14,19 +14,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Download and verify encrypted-only 3D package
+      - name: Download and verify encrypted-only modeled landscape
         run: |
           set -euo pipefail
-          curl --fail --location --retry 3 --proto '=https' --tlsv1.2 'https://github.com/orzull/rebirth-escocia-web/releases/download/encrypted-3d-v1/rebirth-encrypted-web.zip' -o /tmp/rebirth-encrypted-web.zip
-          echo 'bd14ee17fd9c74763e300f75535b0a85ceea8c52681c29bd71ca22a4d50a6aaf  /tmp/rebirth-encrypted-web.zip' | sha256sum --check
+          curl --fail --location --retry 3 --proto '=https' --tlsv1.2 'https://github.com/orzull/rebirth-escocia-web/releases/download/encrypted-landscape-v1/rebirth-encrypted-web.zip' -o /tmp/rebirth-encrypted-web.zip
+          echo 'e825de87789a3a3b3bb8e5dc24cf10cfe12cdb7b532d4789ebd2807949d6eaaf  /tmp/rebirth-encrypted-web.zip' | sha256sum --check
           python3 - <<'PY'
           import zipfile, pathlib, shutil, hashlib
-          allowed = {'index.html','auth.js','game.a2651796cd5aec7cae7d.encrypted.json','sw.js','manifest.webmanifest','icon-192.png','icon-512.png','apple-touch-icon.png','robots.txt','.nojekyll'}
+          allowed = {'index.html','auth.js','game.861b13636639f9de9cac.encrypted.json','sw.js','manifest.webmanifest','icon-192.png','icon-512.png','apple-touch-icon.png','robots.txt','.nojekyll'}
           with zipfile.ZipFile('/tmp/rebirth-encrypted-web.zip') as z:
               assert len(z.infolist()) == len(allowed)
               assert set(z.namelist()) == allowed
               assert sum(i.file_size for i in z.infolist()) < 4000000
-              assert hashlib.sha256(z.read('game.a2651796cd5aec7cae7d.encrypted.json')).hexdigest() == 'a2651796cd5aec7cae7dd28ca482f6e67c53ffd36a2ad2b3694c71d8283cd44d'
+              assert hashlib.sha256(z.read('game.861b13636639f9de9cac.encrypted.json')).hexdigest() == '861b13636639f9de9cac5c2ded9e0d2c4d1e90ce13def4aa8bfd48c66a927654'
               for name in allowed:
                   data = z.read(name)
                   assert b'BOARD_IMAGE' not in data
@@ -44,6 +44,6 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A docs
           if ! git diff --cached --quiet; then
-            git commit -m 'Replace personal game with encrypted 3D edition'
+            git commit -m 'Replace personal game with encrypted modeled landscape'
             git push origin HEAD:main
           fi
