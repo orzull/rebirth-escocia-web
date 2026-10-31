@@ -14,24 +14,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Download and verify encrypted-only package
+      - name: Download and verify encrypted-only 3D package
         run: |
           set -euo pipefail
-          curl --fail --location --retry 3 --proto '=https' --tlsv1.2 'https://github.com/orzull/rebirth-escocia-web/releases/download/encrypted-v1/rebirth-encrypted-web.zip' -o /tmp/rebirth-encrypted-web.zip
-          echo '372dccac982dfe5163724ca7aecc8dcc513cbaece24a19717f5a4158dba3d789  /tmp/rebirth-encrypted-web.zip' | sha256sum --check
+          curl --fail --location --retry 3 --proto '=https' --tlsv1.2 'https://github.com/orzull/rebirth-escocia-web/releases/download/encrypted-3d-v1/rebirth-encrypted-web.zip' -o /tmp/rebirth-encrypted-web.zip
+          echo 'bd14ee17fd9c74763e300f75535b0a85ceea8c52681c29bd71ca22a4d50a6aaf  /tmp/rebirth-encrypted-web.zip' | sha256sum --check
           python3 - <<'PY'
           import zipfile, pathlib, shutil, hashlib
-          allowed = {'index.html','auth.js','game.87e34b08ee31cdf7c386.encrypted.json','sw.js','manifest.webmanifest','icon-192.png','icon-512.png','apple-touch-icon.png','robots.txt','.nojekyll'}
+          allowed = {'index.html','auth.js','game.a2651796cd5aec7cae7d.encrypted.json','sw.js','manifest.webmanifest','icon-192.png','icon-512.png','apple-touch-icon.png','robots.txt','.nojekyll'}
           with zipfile.ZipFile('/tmp/rebirth-encrypted-web.zip') as z:
               assert len(z.infolist()) == len(allowed)
               assert set(z.namelist()) == allowed
               assert sum(i.file_size for i in z.infolist()) < 4000000
-              assert hashlib.sha256(z.read('game.87e34b08ee31cdf7c386.encrypted.json')).hexdigest() == '87e34b08ee31cdf7c3861bf672bda60343b455c08c0e1140665c9fe723bfb7aa'
+              assert hashlib.sha256(z.read('game.a2651796cd5aec7cae7d.encrypted.json')).hexdigest() == 'a2651796cd5aec7cae7dd28ca482f6e67c53ffd36a2ad2b3694c71d8283cd44d'
               for name in allowed:
                   data = z.read(name)
                   assert b'BOARD_IMAGE' not in data
+                  assert b'createRebirthScene' not in data
                   assert b'data:image/jpeg;base64,' not in data
-              pathlib.Path('docs').mkdir(exist_ok=True)
+              if pathlib.Path('docs').exists():
+                  shutil.rmtree('docs')
+              pathlib.Path('docs').mkdir()
               z.extractall('docs')
           PY
       - name: Commit public entry and ciphertext only
@@ -39,8 +42,8 @@ jobs:
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add docs
+          git add -A docs
           if ! git diff --cached --quiet; then
-            git commit -m 'Publish login shell and authenticated encrypted game package'
+            git commit -m 'Replace personal game with encrypted 3D edition'
             git push origin HEAD:main
           fi
