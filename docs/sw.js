@@ -1,6 +1,6 @@
 'use strict';
-const ASSETS=["index.html","auth.js","game.861b13636639f9de9cac.encrypted.json","manifest.webmanifest","icon-192.png","icon-512.png","apple-touch-icon.png","robots.txt"],PAYLOAD="game.861b13636639f9de9cac.encrypted.json",PAYLOAD_HASH="861b13636639f9de9cac5c2ded9e0d2c4d1e90ce13def4aa8bfd48c66a927654";
-const PREFIX='rebirth-encrypted:'+self.registration.scope+':',CACHE=PREFIX+"861b13636639f9de9cac";
+const ASSETS=["index.html","auth.js","game.8835af777cd2082b6b68.encrypted.json","manifest.webmanifest","icon-192.png","icon-512.png","apple-touch-icon.png","robots.txt"],PAYLOAD="game.8835af777cd2082b6b68.encrypted.json",PAYLOAD_HASH="8835af777cd2082b6b6872abf0e639ecb745ed77bd5fe480958f25dc4848a4b7";
+const PREFIX='rebirth-encrypted:'+self.registration.scope+':',CACHE=PREFIX+"8835af777cd2082b6b68";
 const hex=b=>Array.from(new Uint8Array(b),n=>n.toString(16).padStart(2,'0')).join('');
 async function validPayload(response){if(!response||!response.ok)return false;return hex(await crypto.subtle.digest('SHA-256',await response.clone().arrayBuffer()))===PAYLOAD_HASH}
 self.addEventListener('install',e=>e.waitUntil((async()=>{const cache=await caches.open(CACHE);try{for(const file of ASSETS){const u=new URL(file,self.registration.scope),r=await fetch(u,{cache:'reload'});if(!r.ok||r.type==='opaque')throw Error('Cache incomplete');if(file===PAYLOAD&&!await validPayload(r))throw Error('Payload mismatch');await cache.put(u,r)}await self.skipWaiting()}catch(err){await caches.delete(CACHE);throw err}})()));
