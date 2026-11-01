@@ -14,19 +14,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Download and verify encrypted-only clarity update
+      - name: Download and verify encrypted-only ground ink correction
         run: |
           set -euo pipefail
-          curl --fail --location --retry 3 --proto '=https' --tlsv1.2 'https://github.com/orzull/rebirth-escocia-web/releases/download/encrypted-clarity-v4/rebirth-encrypted-web.zip' -o /tmp/rebirth-encrypted-web.zip
-          echo 'a53f2ec5fefb749ad8acf5d898856169aa776d83b17a1b86556f76bb3e81bf0a  /tmp/rebirth-encrypted-web.zip' | sha256sum --check
+          curl --fail --location --retry 3 --proto '=https' --tlsv1.2 'https://github.com/orzull/rebirth-escocia-web/releases/download/encrypted-ground-ink-v5/rebirth-encrypted-web.zip' -o /tmp/rebirth-encrypted-web.zip
+          echo 'f3b2d6f9ce6066580b8fa73000dad4fc866f8cf3621f279740fa4dd5a2d4d84e  /tmp/rebirth-encrypted-web.zip' | sha256sum --check
           python3 - <<'PY'
           import zipfile, pathlib, shutil, hashlib
-          allowed = {'index.html','auth.js','game.e81c1bff02f159b93989.encrypted.json','sw.js','manifest.webmanifest','icon-192.png','icon-512.png','apple-touch-icon.png','robots.txt','.nojekyll'}
+          allowed = {'index.html','auth.js','game.9c3efd1fd804677d6808.encrypted.json','sw.js','manifest.webmanifest','icon-192.png','icon-512.png','apple-touch-icon.png','robots.txt','.nojekyll'}
           with zipfile.ZipFile('/tmp/rebirth-encrypted-web.zip') as z:
               assert len(z.infolist()) == len(allowed)
               assert set(z.namelist()) == allowed
               assert sum(i.file_size for i in z.infolist()) < 4000000
-              assert hashlib.sha256(z.read('game.e81c1bff02f159b93989.encrypted.json')).hexdigest() == 'e81c1bff02f159b939892487e72c9c4fee08bc3f68e189f9f15f323d628cdc8a'
+              assert hashlib.sha256(z.read('game.9c3efd1fd804677d6808.encrypted.json')).hexdigest() == '9c3efd1fd804677d68084dfce6662777aeed4bd6c814f0854839912798370346'
               for name in allowed:
                   data = z.read(name)
                   assert b'BOARD_IMAGE' not in data
@@ -44,6 +44,6 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A docs
           if ! git diff --cached --quiet; then
-            git commit -m 'Publish clear cell symbols, flat token ink and player-colored castle and cathedral models'
+            git commit -m 'Paint small type symbols directly on terrain without empty tile bases, retain trees and turbines'
             git push origin HEAD:main
           fi
