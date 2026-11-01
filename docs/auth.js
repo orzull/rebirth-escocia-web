@@ -1,5 +1,5 @@
 'use strict';
-const PAYLOAD="game.e81c1bff02f159b93989.encrypted.json",PAYLOAD_HASH="e81c1bff02f159b939892487e72c9c4fee08bc3f68e189f9f15f323d628cdc8a",AAD="rebirth-encrypted-v1",ITER=600000;
+const PAYLOAD="game.9c3efd1fd804677d6808.encrypted.json",PAYLOAD_HASH="9c3efd1fd804677d68084dfce6662777aeed4bd6c814f0854839912798370346",AAD="rebirth-encrypted-v1",ITER=600000;
 const $=id=>document.getElementById(id),enc=new TextEncoder();
 const norm=s=>s.normalize('NFKC').trim().toLocaleLowerCase('en-US');
 const b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
